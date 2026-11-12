@@ -1,3 +1,4 @@
+
 package com.jcaa.usersmanagement.infrastructure.config;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.mockStatic;
 
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.exception.PersistenceException;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.EmpleadoController;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,90 +20,104 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * Tests for DependencyContainer.
- *
- * <p>Covers: full wiring succeeds and exposes a non-null UserController, the same UserController
- * instance is returned on every call (immutable composition graph), and a database connection
- * failure during construction propagates as PersistenceException. DriverManager is mocked
- * statically so no real database is required.
- */
 @DisplayName("DependencyContainer")
 @ExtendWith(MockitoExtension.class)
 class DependencyContainerTest {
 
-  @Mock private Connection mockConnection;
+    @Mock
+    private Connection mockConnection;
 
-  // ── constructor + userController() — happy path
+    @Test
+    @DisplayName("Debe crear correctamente el controlador de usuarios")
+    void shouldWireAllDependenciesAndExposeNonNullUserController() {
+        try (final MockedStatic<DriverManager> mockedDriverManager =
+                mockStatic(DriverManager.class)) {
 
-  @Test
-  @DisplayName(
-      "constructor wires all dependencies and userController() returns a non-null UserController")
-  void shouldWireAllDependenciesAndExposeNonNullUserController() {
-    // Arrange
-    try (final MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
-      mockedDriverManager
-          .when(
-              () ->
-                  DriverManager.getConnection(
-                      any(String.class), any(String.class), any(String.class)))
-          .thenReturn(mockConnection);
+            mockedDriverManager
+                    .when(() -> DriverManager.getConnection(
+                            any(String.class), any(String.class), any(String.class)))
+                    .thenReturn(mockConnection);
 
-      // Act
-      final DependencyContainer container = new DependencyContainer();
+            final DependencyContainer container = new DependencyContainer();
 
-      // Assert
-      assertNotNull(
-          container.userController(),
-          "userController() must return a non-null UserController after successful construction");
+            assertNotNull(container.userController());
+        }
     }
-  }
 
-  // ── userController() — immutable composition graph
+    @Test
+    @DisplayName("Debe mantener la misma instancia del controlador de usuarios")
+    void shouldReturnTheSameUserControllerInstanceOnEveryCall() {
+        try (final MockedStatic<DriverManager> mockedDriverManager =
+                mockStatic(DriverManager.class)) {
 
-  @Test
-  @DisplayName("userController() returns the same UserController instance on every call")
-  void shouldReturnTheSameUserControllerInstanceOnEveryCall() {
-    // Arrange
-    try (final MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
-      mockedDriverManager
-          .when(
-              () ->
-                  DriverManager.getConnection(
-                      any(String.class), any(String.class), any(String.class)))
-          .thenReturn(mockConnection);
-      final DependencyContainer container = new DependencyContainer();
+            mockedDriverManager
+                    .when(() -> DriverManager.getConnection(
+                            any(String.class), any(String.class), any(String.class)))
+                    .thenReturn(mockConnection);
 
-      // Act
-      final UserController first = container.userController();
-      final UserController second = container.userController();
+            final DependencyContainer container = new DependencyContainer();
 
-      // Assert
-      assertSame(first, second, "userController() must return the same instance on every call");
+            final UserController first = container.userController();
+            final UserController second = container.userController();
+
+            assertSame(first, second);
+        }
     }
-  }
 
-  // ── constructor — database failure → PersistenceException
+    @Test
+    @DisplayName("Debe crear correctamente el controlador de empleados")
+    void shouldExposeNonNullEmpleadoController() {
+        try (final MockedStatic<DriverManager> mockedDriverManager =
+                mockStatic(DriverManager.class)) {
 
-  @Test
-  @DisplayName("constructor propagates PersistenceException when the database connection fails")
-  void shouldPropagatePersistenceExceptionWhenDatabaseConnectionFails() {
-    // Arrange — exception built before the static mock to avoid intercepting DriverManager
-    // internal calls during SQLException construction
-    final SQLException cause = new SQLException("Connection refused");
-    try (final MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
-      mockedDriverManager
-          .when(
-              () ->
-                  DriverManager.getConnection(
-                      any(String.class), any(String.class), any(String.class)))
-          .thenThrow(cause);
+            mockedDriverManager
+                    .when(() -> DriverManager.getConnection(
+                            any(String.class), any(String.class), any(String.class)))
+                    .thenReturn(mockConnection);
 
-      // Act & Assert
-      assertThrows(
-          PersistenceException.class,
-          DependencyContainer::new,
-          "PersistenceException must propagate without wrapping when DriverManager throws SQLException");
+            final DependencyContainer container = new DependencyContainer();
+
+            assertNotNull(container.empleadoController());
+        }
     }
-  }
+
+    @Test
+    @DisplayName("Debe mantener la misma instancia del controlador de empleados")
+    void shouldReturnTheSameEmpleadoControllerInstanceOnEveryCall() {
+        try (final MockedStatic<DriverManager> mockedDriverManager =
+                mockStatic(DriverManager.class)) {
+
+            mockedDriverManager
+                    .when(() -> DriverManager.getConnection(
+                            any(String.class), any(String.class), any(String.class)))
+                    .thenReturn(mockConnection);
+
+            final DependencyContainer container = new DependencyContainer();
+
+            final EmpleadoController first = container.empleadoController();
+            final EmpleadoController second = container.empleadoController();
+
+            assertSame(first, second);
+        }
+    }
+
+    @Test
+    @DisplayName("Debe propagar el error cuando falla la conexión a la base de datos")
+    void shouldPropagatePersistenceExceptionWhenDatabaseConnectionFails() {
+        final SQLException cause = new SQLException("Connection refused");
+
+        try (final MockedStatic<DriverManager> mockedDriverManager =
+                mockStatic(DriverManager.class)) {
+
+            mockedDriverManager
+                    .when(() -> DriverManager.getConnection(
+                            any(String.class), any(String.class), any(String.class)))
+                    .thenThrow(cause);
+
+            assertThrows(
+                    PersistenceException.class,
+                    DependencyContainer::new
+            );
+        }
+    }
 }

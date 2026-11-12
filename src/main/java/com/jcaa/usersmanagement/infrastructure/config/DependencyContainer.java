@@ -32,7 +32,7 @@ import com.jcaa.usersmanagement.infrastructure.adapter.email.SmtpConfig;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.DatabaseConfig;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.DatabaseConnectionFactory;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.UserRepositoryMySQL;
-import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.EmpleadoRepositoryMySQL;
+import com.jcaa.usersmanagement.infrastructure.adapter.persistence.memory.EmpleadoRepositoryMemory;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.EmpleadoController;
 
@@ -65,8 +65,8 @@ public final class DependencyContainer {
         final UserRepositoryMySQL userRepository =
                 new UserRepositoryMySQL(connection);
 
-        final EmpleadoRepositoryMySQL empleadoRepository =
-                new EmpleadoRepositoryMySQL(connection);
+        final EmpleadoRepositoryMemory empleadoRepository =
+        new EmpleadoRepositoryMemory();
 
         final JavaMailEmailSenderAdapter emailSender =
                 new JavaMailEmailSenderAdapter(buildSmtpConfig(properties));
