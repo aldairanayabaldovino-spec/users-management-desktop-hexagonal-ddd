@@ -1,15 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.jcaa.usersmanagement.domain.model;
+
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-/**
- *
- * @author USER
- */
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class EmpleadoModelTest {
 
     @Test
@@ -27,5 +23,47 @@ class EmpleadoModelTest {
         assertEquals("1234567890", empleado.getDocumento());
         assertEquals("Auxiliar", empleado.getCargo());
         assertEquals(new BigDecimal("1500000"), empleado.getSalario());
+    }
+
+    @Test
+    void noDebePermitirIdVacio() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new EmpleadoModel("", "Aldair", "1234567890",
+                        "Auxiliar", new BigDecimal("1500000")));
+    }
+
+    @Test
+    void noDebePermitirNombreVacio() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new EmpleadoModel("EMP-001", "", "1234567890",
+                        "Auxiliar", new BigDecimal("1500000")));
+    }
+
+    @Test
+    void noDebePermitirDocumentoVacio() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new EmpleadoModel("EMP-001", "Aldair", "",
+                        "Auxiliar", new BigDecimal("1500000")));
+    }
+
+    @Test
+    void noDebePermitirCargoVacio() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new EmpleadoModel("EMP-001", "Aldair", "1234567890",
+                        "", new BigDecimal("1500000")));
+    }
+
+    @Test
+    void noDebePermitirSalarioNulo() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new EmpleadoModel("EMP-001", "Aldair", "1234567890",
+                        "Auxiliar", null));
+    }
+
+    @Test
+    void noDebePermitirSalarioNegativo() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new EmpleadoModel("EMP-001", "Aldair", "1234567890",
+                        "Auxiliar", new BigDecimal("-1000")));
     }
 }
