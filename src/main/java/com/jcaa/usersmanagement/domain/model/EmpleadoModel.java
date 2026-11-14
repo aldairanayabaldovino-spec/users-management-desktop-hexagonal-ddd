@@ -1,49 +1,75 @@
 
 package com.jcaa.usersmanagement.domain.model;
 
-import java.math.BigDecimal;
-import lombok.Getter;
+import com.jcaa.usersmanagement.domain.valueobject.CargoEmpleado;
+import com.jcaa.usersmanagement.domain.valueobject.DocumentoEmpleado;
+import com.jcaa.usersmanagement.domain.valueobject.NombreEmpleado;
+import com.jcaa.usersmanagement.domain.valueobject.Salario;
 
-@Getter
+import java.math.BigDecimal;
+
+/**
+ * Entidad de dominio que representa un empleado.
+ */
 public class EmpleadoModel {
 
     private final String id;
-    private final String nombre;
-    private final String documento;
-    private final String cargo;
-    private final BigDecimal salario;
+    private final NombreEmpleado nombre;
+    private final DocumentoEmpleado documento;
+    private final CargoEmpleado cargo;
+    private final Salario salario;
 
     public EmpleadoModel(
             String id,
             String nombre,
             String documento,
             String cargo,
-            BigDecimal salario) {
-
+            BigDecimal salario
+    ) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("El ID es obligatorio");
         }
 
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre es obligatorio");
-        }
+        this.id = id.trim();
+        this.nombre = new NombreEmpleado(nombre);
+        this.documento = new DocumentoEmpleado(documento);
+        this.cargo = new CargoEmpleado(cargo);
+        this.salario = new Salario(salario);
+    }
 
-        if (documento == null || documento.isBlank()) {
-            throw new IllegalArgumentException("El documento es obligatorio");
-        }
+    public String getId() {
+        return id;
+    }
 
-        if (cargo == null || cargo.isBlank()) {
-            throw new IllegalArgumentException("El cargo es obligatorio");
-        }
+    public String getNombre() {
+        return nombre.value();
+    }
 
-        if (salario == null || salario.signum() < 0) {
-            throw new IllegalArgumentException("El salario no puede ser nulo ni negativo");
-        }
+    public String getDocumento() {
+        return documento.value();
+    }
 
-        this.id = id;
-        this.nombre = nombre;
-        this.documento = documento;
-        this.cargo = cargo;
-        this.salario = salario;
+    public String getCargo() {
+        return cargo.value();
+    }
+
+    public BigDecimal getSalario() {
+        return salario.value();
+    }
+
+    public NombreEmpleado getNombreValueObject() {
+        return nombre;
+    }
+
+    public DocumentoEmpleado getDocumentoValueObject() {
+        return documento;
+    }
+
+    public CargoEmpleado getCargoValueObject() {
+        return cargo;
+    }
+
+    public Salario getSalarioValueObject() {
+        return salario;
     }
 }

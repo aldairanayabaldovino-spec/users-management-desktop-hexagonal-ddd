@@ -1,10 +1,16 @@
+
 package com.jcaa.usersmanagement.domain.model;
 
-import org.junit.jupiter.api.Test;
+import com.jcaa.usersmanagement.domain.valueobject.CargoEmpleado;
+import com.jcaa.usersmanagement.domain.valueobject.DocumentoEmpleado;
+import com.jcaa.usersmanagement.domain.valueobject.NombreEmpleado;
+import com.jcaa.usersmanagement.domain.valueobject.Salario;
+
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class EmpleadoModelTest {
 
@@ -13,57 +19,121 @@ class EmpleadoModelTest {
         EmpleadoModel empleado = new EmpleadoModel(
                 "EMP-001",
                 "Aldair Anaya",
-                "1234567890",
+                "123456789",
                 "Auxiliar",
                 new BigDecimal("1500000")
         );
 
         assertEquals("EMP-001", empleado.getId());
         assertEquals("Aldair Anaya", empleado.getNombre());
-        assertEquals("1234567890", empleado.getDocumento());
+        assertEquals("123456789", empleado.getDocumento());
         assertEquals("Auxiliar", empleado.getCargo());
-        assertEquals(new BigDecimal("1500000"), empleado.getSalario());
+        assertEquals(
+                new BigDecimal("1500000"),
+                empleado.getSalario()
+        );
     }
 
     @Test
-    void noDebePermitirIdVacio() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new EmpleadoModel("", "Aldair", "1234567890",
-                        "Auxiliar", new BigDecimal("1500000")));
+    void debeCrearLosObjetosDeValorCorrectamente() {
+        EmpleadoModel empleado = new EmpleadoModel(
+                "EMP-001",
+                "Aldair Anaya",
+                "123456789",
+                "Auxiliar",
+                new BigDecimal("1500000")
+        );
+
+        assertNotNull(empleado.getNombreValueObject());
+        assertNotNull(empleado.getDocumentoValueObject());
+        assertNotNull(empleado.getCargoValueObject());
+        assertNotNull(empleado.getSalarioValueObject());
+
+        assertInstanceOf(
+                NombreEmpleado.class,
+                empleado.getNombreValueObject()
+        );
+        assertInstanceOf(
+                DocumentoEmpleado.class,
+                empleado.getDocumentoValueObject()
+        );
+        assertInstanceOf(
+                CargoEmpleado.class,
+                empleado.getCargoValueObject()
+        );
+        assertInstanceOf(
+                Salario.class,
+                empleado.getSalarioValueObject()
+        );
     }
 
     @Test
-    void noDebePermitirNombreVacio() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new EmpleadoModel("EMP-001", "", "1234567890",
-                        "Auxiliar", new BigDecimal("1500000")));
+    void noDebeAceptarIdNulo() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new EmpleadoModel(
+                        null,
+                        "Aldair Anaya",
+                        "123456789",
+                        "Auxiliar",
+                        new BigDecimal("1500000")
+                )
+        );
     }
 
     @Test
-    void noDebePermitirDocumentoVacio() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new EmpleadoModel("EMP-001", "Aldair", "",
-                        "Auxiliar", new BigDecimal("1500000")));
+    void noDebeAceptarIdVacio() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new EmpleadoModel(
+                        "",
+                        "Aldair Anaya",
+                        "123456789",
+                        "Auxiliar",
+                        new BigDecimal("1500000")
+                )
+        );
     }
 
     @Test
-    void noDebePermitirCargoVacio() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new EmpleadoModel("EMP-001", "Aldair", "1234567890",
-                        "", new BigDecimal("1500000")));
+    void noDebeAceptarIdConEspacios() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new EmpleadoModel(
+                        "   ",
+                        "Aldair Anaya",
+                        "123456789",
+                        "Auxiliar",
+                        new BigDecimal("1500000")
+                )
+        );
     }
 
     @Test
-    void noDebePermitirSalarioNulo() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new EmpleadoModel("EMP-001", "Aldair", "1234567890",
-                        "Auxiliar", null));
+    void noDebeAceptarNombreVacio() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new EmpleadoModel(
+                        "EMP-001",
+                        "",
+                        "123456789",
+                        "Auxiliar",
+                        new BigDecimal("1500000")
+                )
+        );
     }
 
     @Test
-    void noDebePermitirSalarioNegativo() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new EmpleadoModel("EMP-001", "Aldair", "1234567890",
-                        "Auxiliar", new BigDecimal("-1000")));
+    void noDebeAceptarSalarioNegativo() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new EmpleadoModel(
+                        "EMP-001",
+                        "Aldair Anaya",
+                        "123456789",
+                        "Auxiliar",
+                        new BigDecimal("-100")
+                )
+        );
     }
 }
